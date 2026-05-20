@@ -1,5 +1,7 @@
 # Snake Runner: IDE privado de Python
 
+**[>> Ir al editor](run)**
+
 Este proyecto tiene por objetivo proveer una plataforma simple, pero segura para que mis alumnos de programación puedan probar su código,
 ya que no cuentan con un dispositivo capaz de ejecutar Python localmente.
 
