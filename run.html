@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aula Virtual de Python</title>
+    <title>Snake Runner</title>
     
     <link rel="stylesheet" href="https://pyscript.net/releases/2024.1.1/core.css" />
     <script type="module" src="https://pyscript.net/releases/2024.1.1/core.js"></script>
@@ -84,10 +84,10 @@
 <body>
 
     <div class="container">
-    <h1>Laboratorio de Python</h1>
-    <div class="instructor-note">
-        <!-- vacio -->
-    </div>
+    <h1>Snake Runner (Python)</h1>
+    <!-- <div class="instructor-note">
+        
+    </div> -->
 
     <textarea id="codigo-alumno"># Introduce el codigo abajo
         
@@ -127,7 +127,8 @@ sys.stdout = StringIO()
 ${codigo}
 
 output = sys.stdout.getvalue()
-output
+#output
+print(output)
 `;
             // Ejecutamos el código modificado en el intérprete
             const interprete = await kernel;
