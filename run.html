@@ -100,13 +100,17 @@
 </div>
 
 <script type="module">
-    import { PyScript } from "https://pyscript.net/releases/2026.3.1/core.js";
+    let runtimePython;
+
+    document.addEventListener('py-ready', () => {
+        runtimePython = document.querySelector('script-py')._py.next;  // py_next carga el kernel?
+    });
 
     window.correrPython = async function() {
         // 1. Obtener el código actual que escribió el alumno en CodeMirror
         const codigo = window.editor.getValue();
         const salidaDiv = document.getElementById("consola-salida");
-        salidaDiv.innerText = "Ejecutando...";
+        salidaDiv.innerText = "Ejecutando...";  // texto transitorio, no deberia quedarse ahi
 
         try {
             // 2. Obtener la instancia de la máquina virtual de Python (Pyodide)
