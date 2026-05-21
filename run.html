@@ -3,73 +3,171 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snake Runner</title>
+    <title>Aula Virtual de Python</title>
     
     <link rel="stylesheet" href="https://pyscript.net/releases/2024.1.1/core.css" />
     <script type="module" src="https://pyscript.net/releases/2024.1.1/core.js"></script>
 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.12/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.12/theme/dracula.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.12/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.12/mode/python/python.min.js"></script>
+
     <style>
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f4f6f9;
-            color: #333;
-            max-width: 800px;
-            margin: 40px auto;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
             padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container {
+            width: 100%;
+            max-width: 900px;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
         }
         h1 {
-            color: #2c3e50;
+            color: #1e293b;
+            margin-top: 0;
             text-align: center;
         }
-        .editor-container {
-            background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            padding: 20px;
+        .instructor-note {
+            background-color: #e2e8f0;
+            border-left: 4px solid #3b82f6;
+            padding: 12px;
+            border-radius: 4px;
             margin-bottom: 20px;
+            font-size: 0.95rem;
         }
-        label {
+        /* Estilos del editor CodeMirror */
+        .CodeMirror {
+            border-radius: 8px;
+            font-size: 16px;
+            height: 300px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .btn-ejecutar {
+            background-color: #10b981;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 1rem;
             font-weight: bold;
-            display: block;
-            margin-bottom: 8px;
-            color: #555;
-        }
-        #output {
-            background-color: #1e1e1e;
-            color: #76c7c0;
-            font-family: 'Courier New', Courier, monospace;
-            padding: 15px;
             border-radius: 6px;
-            min-height: 100px;
-            white-height: pre-wrap;
-            overflow-y: auto;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
+            cursor: pointer;
+            margin: 15px 0;
+            transition: background 0.2s;
+            display: block;
+            width: 100%;
         }
-        .loading-msg {
-            color: #7f8c8d;
-            font-style: italic;
-            text-align: center;
-            margin-bottom: 15px;
+        .btn-ejecutar:hover {
+            background-color: #059669;
+        }
+        /* Consola de salida */
+        .output-box {
+            background-color: #0f172a;
+            color: #38bdf8;
+            font-family: 'Fira Code', 'Courier New', monospace;
+            padding: 15px;
+            border-radius: 8px;
+            min-height: 120px;
+            white-space: pre-wrap;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
         }
     </style>
 </head>
 <body>
 
-    <h1>Mi IDE de Python en la Web</h1>
-    <p class="loading-msg">Nota: La primera vez puede tardar unos segundos mientras el navegador descarga el entorno Python (WASM).</p>
-
-    <div class="editor-container">
-        <label for="codigo">Escribe tu código Python aquí:</label>
-        
-        <script-py terminal id="mi-editor">
-# Introduce codigo aqui
-        </script-py>
+<div class="container">
+    <h1>Laboratorio de Python</h1>
+    <div class="instructor-note">
+        <strong>Para los alumnos:</strong> Modifiquen el código de la caja negra a su gusto y hagan clic en "Ejecutar Código" para ver los resultados en la sección azul.
     </div>
 
-    <label>Consola / Salida del código:</label>
-    <div id="output"></div>
+    <!-- El área de texto que CodeMirror transformará en un editor genial -->
+    <textarea id="codigo-alumno"># Escribe tu tarea de Python aquí abajo
 
-    <script>
-    </script>
+def calcular_promedio(notas):
+    return sum(notas) / len(notas)
+
+mis_notas = [10, 9, 8, 10]
+print("Mis notas son:", mis_notas)
+print("Mi promedio es:", calcular_promedio(mis_notas))
+</textarea>
+
+    <button class="btn-ejecutar" onclick="correrPython()">⚡ Ejecutar Código</button>
+
+    <h3>Resultado de la Consola:</h3>
+    <div id="consola-salida" class="output-box">El código aún no se ha ejecutado...</div>
+</div>
+
+<!-- Este bloque oculto de PyScript contiene la lógica en JavaScript/Python para capturar y ejecutar el código dinámicamente -->
+<script type="module">
+    import { PyScript } from "https://pyscript.net/releases/2024.1.1/core.js";
+
+    window.correrPython = async function() {
+        // 1. Obtener el código actual que escribió el alumno en CodeMirror
+        const codigo = window.editor.getValue();
+        const salidaDiv = document.getElementById("consola-salida");
+        salidaDiv.innerText = "Ejecutando...";
+
+        try {
+            // 2. Obtener la instancia de la máquina virtual de Python (Pyodide)
+            const pyExtension = document.querySelector('script-py') || await queryPyScript();
+            
+            // Creamos un entorno limpio para interceptar los 'print()'
+            // Usamos una función nativa de JavaScript para evaluar el código Python mediante PyScript
+            const pyscriptCore = await import("https://pyscript.net/releases/2024.1.1/core.js");
+            
+            // Para simplificar la captura de los print, inyectamos un pequeño truco en Python
+            // Redirigimos el stdout a nuestra cajita azul en el HTML
+            const codigoModificado = `
+import sys
+from io import StringIO
+sys.stdout = StringIO()
+
+# Código
+${codigo}
+
+output = sys.stdout.getvalue()
+output
+`;
+            // Ejecutamos el código modificado en el intérprete
+            const interprete = await kernel;
+            const resultado = await interprete.runPythonAsync(codigoModificado);
+            
+            salidaDiv.innerText = resultado || "El código se ejecutó con éxito (sin salidas de texto).";
+        } catch (error) {
+            // Si el alumno comete un error de sintaxis, se lo mostramos en rojo
+            salidaDiv.style.color = "#ef4444";
+            salidaDiv.innerText = "Error en el código:\n" + error.message;
+        }
+    };
+
+    // Helper para inicializar el intérprete en segundo plano
+    let kernel = new Promise((resolve) => {
+        document.addEventListener("py-ready", (e) => {
+            // Espera a que PyScript esté listo para capturar el núcleo de ejecución
+        });
+    });
+</script>
+
+<script>
+    // Inicializar CodeMirror sobre nuestro textarea
+    window.editor = CodeMirror.fromTextArea(document.getElementById("codigo-alumno"), {
+        mode: "python",
+        theme: "dracula",
+        lineNumbers: true,
+        indentUnit: 4,
+        matchBrackets: true
+    });
+</script>
+
+<script-py style="display:none;"></script-py>
+
 </body>
-</html>
