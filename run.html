@@ -103,55 +103,44 @@
     let runtimePython;
 
     document.addEventListener('py-ready', () => {
-        runtimePython = document.querySelector('script-py')._py.next;  // py_next carga el kernel?
+        runtimePython = document.querySelector('script-py')._py.next;
     });
 
     window.correrPython = async function() {
-        // 1. Obtener el código actual que escribió el alumno en CodeMirror
         const codigo = window.editor.getValue();
         const salidaDiv = document.getElementById("consola-salida");
-        salidaDiv.innerText = "Ejecutando...";  // texto transitorio, no deberia quedarse ahi
+        
+        salidaDiv.style.color = "#38bdf8";  // cian
+        salidaDiv.innerText = "Ejecutando...";
+
+        if (!runtimePython) {
+            salidaDiv.style.color = "#eab308"; // Color amarillo de advertencia
+            salidaDiv.innerText = "El entorno de Python aún se está descargando. Por favor, espera unos segundos e intenta de nuevo.";
+            return;
+        }
 
         try {
-            // 2. Obtener la instancia de la máquina virtual de Python (Pyodide)
-            const pyExtension = document.querySelector('script-py') || await queryPyScript();
-            
-            // Creamos un entorno limpio para interceptar los 'print()'
-            // Usamos una función nativa de JavaScript para evaluar el código Python mediante PyScript
-            const pyscriptCore = await import("https://pyscript.net/releases/2024.1.1/core.js");
-            
-            // Para simplificar la captura de los print, inyectamos un pequeño truco en Python
-            // Redirigimos el stdout a nuestra cajita azul en el HTML
             const codigoModificado = `
 import sys
 from io import StringIO
 sys.stdout = StringIO()
 
-# Código
+# Código real escrito por el alumno
 ${codigo}
 
-output = sys.stdout.getvalue()
-#output
-print(output)
+# Retornamos el contenido acumulado en el buffer
+sys.stdout.getvalue()
 `;
-            // Ejecutamos el código modificado en el intérprete
-            const interprete = await kernel;
-            const resultado = await interprete.runPythonAsync(codigoModificado);
+
+            const resultado = await runtimePython.runPythonAsync(codigoModificado);
             
-            salidaDiv.innerText = resultado || "El código se ejecutó con éxito (sin salidas de texto).";
+            salidaDiv.innerText = resultado.trim() || "El código se ejecutó con éxito (sin salidas de texto).";
+            
         } catch (error) {
-            // Si el alumno comete un error de sintaxis, se lo mostramos en rojo
-            salidaDiv.style.color = "#ef4444";
-            salidaDiv.innerText = "Error en el código:\n" + error.message;
+            salidaDiv.style.color = "#ef4444";  // rojo
+            salidaDiv.innerText = "Error en el código de Python:\n" + error.message;
         }
     };
-
-    // Helper para inicializar el intérprete en segundo plano
-    let kernel = new Promise((resolve) => {
-        document.addEventListener("py-ready", (e) => {
-            // Espera a que PyScript esté listo para capturar el núcleo de ejecución
-        });
-    });
 </script>
 
 <script>
