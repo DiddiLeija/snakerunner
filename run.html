@@ -100,10 +100,18 @@
 </div>
 
 <script type="module">
+    import { hooks } from "https://pyscript.net/releases/2024.1.1/core.js";
+    
     let runtimePython;
 
     document.addEventListener('py-ready', () => {
         runtimePython = document.querySelector('script-py')._py.next;
+    });
+
+    hooks.onReady.add((wrap) => {
+        // 'wrap.interpreter' contiene el motor de Python (Pyodide) listo para usar
+        runtimePython = wrap.interpreter;
+        console.log("¡Intérprete de Python cargado con éxito en el navegador!");
     });
 
     window.correrPython = async function() {
