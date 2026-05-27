@@ -114,10 +114,15 @@
         salidaDiv.innerText = "Ejecutando...";
 
         if (!runtimePython) {
-            salidaDiv.style.color = "#eab308"; // Color amarillo de advertencia
+            salidaDiv.style.color = "#eab308"; // amarillo
             salidaDiv.innerText = "El entorno de Python aún se está descargando. Por favor, espera unos segundos e intenta de nuevo.";
             return;
         }
+
+        const pyExtension = document.querySelector('script-py') || await queryPyScript();
+            
+        // Usamos una función nativa de JavaScript para evaluar el código Python mediante PyScript
+        const pyscriptCore = await import("https://pyscript.net/releases/2024.1.1/core.js");
 
         try {
             const codigoModificado = `
@@ -131,7 +136,7 @@ ${codigo}
 # Retornamos el contenido acumulado en el buffer
 sys.stdout.getvalue()
 `;
-
+            const interprete = await kernel;
             const resultado = await runtimePython.runPythonAsync(codigoModificado);
             
             salidaDiv.innerText = resultado.trim() || "El código se ejecutó con éxito (sin salidas de texto).";
@@ -141,6 +146,12 @@ sys.stdout.getvalue()
             salidaDiv.innerText = "Error en el código de Python:\n" + error.message;
         }
     };
+
+    let kernel = new Promise((resolve) => {
+        document.addEventListener("py-ready", (e) => {
+            // Espera a PyScript
+        });
+    });
 </script>
 
 <script>
