@@ -100,18 +100,13 @@
 </div>
 
 <script type="module">
-    import { hooks } from "https://pyscript.net/releases/2024.1.1/core.js";
+    import { hooks } from "https://pyscript.net/releases/2026.3.1/core.js";
     
     let runtimePython;
 
-    document.addEventListener('py-ready', () => {
-        runtimePython = document.querySelector('script-py')._py.next;
-    });
-
     hooks.onReady.add((wrap) => {
-        // 'wrap.interpreter' contiene el motor de Python (Pyodide) listo para usar
         runtimePython = wrap.interpreter;
-        console.log("¡Intérprete de Python cargado con éxito en el navegador!");
+        console.log("¡Intérprete de Python cargado con éxito!");
     });
 
     window.correrPython = async function() {
@@ -127,11 +122,6 @@
             return;
         }
 
-        const pyExtension = document.querySelector('script-py') || await queryPyScript();
-            
-        // Usamos una función nativa de JavaScript para evaluar el código Python mediante PyScript
-        const pyscriptCore = await import("https://pyscript.net/releases/2024.1.1/core.js");
-
         try {
             const codigoModificado = `
 import sys
@@ -144,7 +134,7 @@ ${codigo}
 # Retornamos el contenido acumulado en el buffer
 sys.stdout.getvalue()
 `;
-            const interprete = await kernel;
+            
             const resultado = await runtimePython.runPythonAsync(codigoModificado);
             
             salidaDiv.innerText = resultado.trim() || "El código se ejecutó con éxito (sin salidas de texto).";
@@ -154,12 +144,6 @@ sys.stdout.getvalue()
             salidaDiv.innerText = "Error en el código de Python:\n" + error.message;
         }
     };
-
-    let kernel = new Promise((resolve) => {
-        document.addEventListener("py-ready", (e) => {
-            // Espera a PyScript
-        });
-    });
 </script>
 
 <script>
