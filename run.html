@@ -104,9 +104,10 @@
     
     let runtimePython;
 
-    hooks.onReady.add((wrap) => {
+    // se usa hooks.main.*, no hooks directamente
+    hooks.main.onReady.add((wrap) => {
         runtimePython = wrap.interpreter;
-        console.log("¡Intérprete de Python cargado con éxito!");
+        console.log("Intérprete de Python cargado con éxito");
     });
 
     window.correrPython = async function() {
@@ -128,7 +129,7 @@ import sys
 from io import StringIO
 sys.stdout = StringIO()
 
-# Código real escrito por el alumno
+# Código real
 ${codigo}
 
 # Retornamos el contenido acumulado en el buffer
@@ -144,17 +145,6 @@ sys.stdout.getvalue()
             salidaDiv.innerText = "Error en el código de Python:\n" + error.message;
         }
     };
-</script>
-
-<script>
-    // Inicializar CodeMirror sobre nuestro textarea
-    window.editor = CodeMirror.fromTextArea(document.getElementById("codigo-alumno"), {
-        mode: "python",
-        theme: "dracula",
-        lineNumbers: true,
-        indentUnit: 4,
-        matchBrackets: true
-    });
 </script>
 
 <script-py style="display:none;"></script-py>
