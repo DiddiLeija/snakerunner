@@ -147,6 +147,16 @@ sys.stdout.getvalue()
     };
 </script>
 
+<script>
+    window.editor = CodeMirror.fromTextArea(document.getElementById("codigo-alumno"), {
+        mode: "python",
+        theme: "dracula",
+        lineNumbers: true,
+        indentUnit: 4,
+        matchBrackets: true
+    });
+</script>
+
 <script-py style="display:none;"></script-py>
 
 </body>
